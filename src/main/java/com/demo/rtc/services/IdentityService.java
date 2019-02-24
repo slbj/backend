@@ -7,4 +7,6 @@ public interface IdentityService {
     UserInfo loginWithPwd(String email, String password);
 
     UserInfo signupWithPwd(SignupRequestVO signupRequestVO);
+
+    boolean getUserRegistration(String email);
 }

@@ -28,4 +28,10 @@ public class IdentityServiceImpl implements IdentityService {
         UserInfo userInfo = new UserInfo(userVO.getEmail(), userVO.getDisplayName());
         return userInfo;
     }
+
+    @Override
+    public boolean getUserRegistration(String email) {
+        UserVO userVO = dbClient.findUser(email);
+        return userVO != null;
+    }
 }

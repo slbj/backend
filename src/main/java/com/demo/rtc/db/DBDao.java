@@ -33,7 +33,7 @@ public class DBDao implements DBClient {
                 + "' and password='"
                 + password
                 + "';";
-        return login(sqlQuery);
+        return getUserInfo(sqlQuery);
     }
 
     @Override
@@ -105,6 +105,15 @@ public class DBDao implements DBClient {
                 + courseId
                 + "';";
         return checkUserRegisteredCourse(sqlQuery);
+    }
+
+    @Override
+    public UserVO findUser(String email) {
+        prepareDatabase();
+        String sqlQuery = "SELECT first_name, last_name, display_name, email FROM user WHERE email='"
+                + email
+                + "';";
+        return getUserInfo(sqlQuery);
     }
 
     private Connection getConnection(boolean dbExisted) {
@@ -179,7 +188,8 @@ public class DBDao implements DBClient {
                 + "   password        VARCHAR(500),"
                 + "   last_name       VARCHAR(500),"
                 + "   first_name      VARCHAR(500),"
-                + "   display_name    VARCHAR(500))";
+                + "   display_name    VARCHAR(500),"
+                + "   PRIMARY KEY (email))";
         runUpdate(preparedStatement, sqlCreateUserTable, true);
     }
 
@@ -192,18 +202,20 @@ public class DBDao implements DBClient {
                 + "   end_date        DATE,"
                 + "   start_time      TIME,"
                 + "   end_time        TIME,"
-                + "   description     VARCHAR(2000))";
+                + "   description     VARCHAR(2000),"
+                + "   PRIMARY KEY (course_id))";
         runUpdate(preparedStatement, sqlCreateCourseTable, true);
     }
 
     private void createRegistrationTable() {
         String sqlCreateCourseTable = "CREATE TABLE IF NOT EXISTS " + TABLE_REGISTRATION
                 + "  (email            VARCHAR(500),"
-                + "   course_id        VARCHAR(500))";
+                + "   course_id        VARCHAR(500),"
+                + "   PRIMARY KEY (email))";
         runUpdate(preparedStatement, sqlCreateCourseTable, true);
     }
 
-    private UserVO login(String sqlQuery) {
+    private UserVO getUserInfo(String sqlQuery) {
         try {
             connection = getConnection(true);
             preparedStatement = connection.prepareStatement(sqlQuery);

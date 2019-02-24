@@ -27,7 +27,14 @@ public class IdentityResource {
             UserInfo userInfo = identityService.loginWithPwd(loginRequestVO.getEmail(), loginRequestVO.getPassword());
 
             if (userInfo == null) {
-                return Response.status(Response.Status.UNAUTHORIZED).build();
+                FailureResponse failureResponse = new FailureResponse(
+                        Response.Status.UNAUTHORIZED.getStatusCode(),
+                        "UNAUTHORIZED",
+                        "Email or password is incorrect!");
+                return Response
+                        .status(Response.Status.UNAUTHORIZED)
+                        .entity(objectMapper.writeValueAsString(failureResponse))
+                        .build();
             }
             jsonResponse = objectMapper.writeValueAsString(userInfo);
         } catch (IOException e) {
@@ -47,6 +54,17 @@ public class IdentityResource {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             SignupRequestVO signupRequestVO = objectMapper.readValue(requestJsonStr, SignupRequestVO.class);
+            boolean isUserRegistered = identityService.getUserRegistration(signupRequestVO.getEmail());
+            if (isUserRegistered) {
+                FailureResponse failureResponse = new FailureResponse(
+                        Response.Status.BAD_REQUEST.getStatusCode(),
+                        "BAD_REQUEST",
+                        "User with email '" + signupRequestVO.getEmail() + "' has been registered!");
+                return Response
+                        .status(Response.Status.BAD_REQUEST)
+                        .entity(objectMapper.writeValueAsString(failureResponse))
+                        .build();
+            }
             jsonResponse = objectMapper.writeValueAsString(identityService.signupWithPwd(signupRequestVO));
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,5 +72,4 @@ public class IdentityResource {
 
         return Response.ok().entity(jsonResponse).build();
     }
-
 }

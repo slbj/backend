@@ -16,4 +16,6 @@ public interface DBClient {
     boolean uploadCourse(CourseVO courseVO);
 
     boolean getUserCourseRegistrationStatus(String email, String courseId);
+
+    UserVO findUser(String email);
 }
